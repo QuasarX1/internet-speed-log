@@ -71,6 +71,11 @@ internet-speed-log log
 
 ```console
 internet-speed-log plot
+```
+
+Or to plot a specific renamed log file:
+
+```console
 internet-speed-log plot log-file.txt
 ```
 
