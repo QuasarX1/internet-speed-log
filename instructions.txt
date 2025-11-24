@@ -1,0 +1,5 @@
+Create shortcut to the run.bat file
+Place in the windows startup folder (see shortcut)
+This will run when windows starts
+
+Double click the run.bat file to start manually
