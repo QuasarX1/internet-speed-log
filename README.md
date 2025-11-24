@@ -7,12 +7,71 @@ Track your internet speed over time.
 ## Table of Contents
 
 - [Installation](#installation)
+- [Usage](#usage)
+  - [Logging](#logging)
+  - [Plotting](#plotting)
 - [License](#license)
 
 ## Installation
 
+Bash (Linux):
+
+```bash
+python3 venv env
+source env/bin/activate
+pip3 install -r requirements.txt
+```
+
+PowerShell (Windows):
+
+```powershell
+python venv env
+.\env\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+CMD (Windows):
+
+```cmd
+python venv env
+.\env\Scripts\activate.bat
+pip install -r requirements.txt
+```
+
+## Usage
+
+Bash (Linux):
+
+```bash
+source env/bin/activate
+internet-speed-log
+```
+
+PowerShell (Windows):
+
+```powershell
+.\env\Scripts\Activate.ps1
+internet-speed-log
+```
+
+CMD (Windows):
+
+```cmd
+.\env\Scripts\activate.bat
+internet-speed-log
+```
+
+### Logging
+
 ```console
-TODO
+internet-speed-log log
+```
+
+### Plotting
+
+```console
+internet-speed-log plot
+internet-speed-log plot log-file.txt
 ```
 
 ## License
