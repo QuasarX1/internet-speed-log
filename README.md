@@ -12,7 +12,7 @@ Track your internet speed over time.
 ## Installation
 
 ```console
-pip install internet-speed-log
+TODO
 ```
 
 ## License
