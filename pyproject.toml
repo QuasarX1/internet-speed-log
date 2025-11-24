@@ -1,0 +1,59 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "internet-speed-log"
+dynamic = ["version"]
+description = ''
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "Internet Speed Log License v1.0" }
+keywords = []
+authors = [
+  { name = "Christopher Rowe", email = "chris.rowe19@outlook.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/QuasarX1/internet-speed-log#readme"
+Issues = "https://github.com/QuasarX1/internet-speed-log/issues"
+Source = "https://github.com/QuasarX1/internet-speed-log"
+
+[tool.hatch.version]
+path = "src/internet_speed_log/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/internet_speed_log tests}"
+
+[tool.coverage.run]
+source_pkgs = ["internet_speed_log", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/internet_speed_log/__about__.py",
+]
+
+[tool.coverage.paths]
+internet_speed_log = ["src/internet_speed_log", "*/internet-speed-log/src/internet_speed_log"]
+tests = ["tests", "*/internet-speed-log/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

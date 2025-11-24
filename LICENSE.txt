@@ -1,0 +1,33 @@
+Internet Speed Log License (v1.0)
+
+Copyright (c) 2025 Christopher J. R. Rowe
+
+1. Grant of Permission
+   - The source code covered by this license, and any compiled or legitimately distributed version of it, is made publicly available for a limited period at the discretion of the author.
+   - Individuals are permitted to view, download, and privately modify the source code for personal or household use. Such modifications may be shared within a household or family context, but may not be redistributed publicly without explicit written permission from the author.
+
+2. Redistribution
+   - Redistribution of the source code, whether modified or unmodified, outside of the official repository is prohibited unless prior written approval is obtained from the author.
+   - The author reserves the right to determine whether any particular use or sharing falls within the scope of “private” or “household” use.
+
+3. Commercial Use
+   - This license does not grant permission for commercial use. Any commercial use requires prior written approval from the author and may be subject to separate terms or fees.
+
+4. Contributions
+   - Contributions to the project (e.g., via pull requests) are encouraged.
+   - Submission of a contribution does not confer ownership, in whole or in part, of the project.
+   - Attribution will be granted at the author’s discretion for contributions that are accepted and retained in a finalized release version. Contributions that are merged but later removed, or otherwise not retained in a release, may not receive attribution.
+   - Significant contributions to the development process may reasonably expect attribution, but final determination rests with the author.
+
+5. Licensing Changes
+   - Future versions of this project may be released under different licensing terms. This license applies only to the version of the source code to which it is attached.
+
+6. General
+   - By using, modifying, or contributing to this project, you agree to abide by the terms of this license.
+   - All rights not expressly granted herein are reserved by the author.
+
+7. Disclaimer of Warranty
+   - The software is provided “as is,” without warranty of any kind, express or implied, including but not limited to warranties of accuracy, reliability, merchantability, fitness for a particular purpose, or non‑infringement. The author makes no guarantees regarding the correctness or usefulness of the software.
+
+8. Limitation of Liability
+   - In no event shall the author be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use of the software. This includes, without limitation, any direct, indirect, incidental, consequential, or special damages, even if the author has been advised of the possibility of such damages.
