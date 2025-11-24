@@ -1,0 +1,11 @@
+# Python Virtual Environment
+env/
+
+# Output file
+log.txt
+
+# Compilation & Distribution Products
+*.pyc
+__pycache__/
+build/
+dist/
