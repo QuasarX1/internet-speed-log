@@ -1,6 +1,10 @@
 # Python Virtual Environment
 env/
 
+# Instance files
+config.properties
+internet-speed-log-config.yaml
+
 # Output file
 log.txt
 
