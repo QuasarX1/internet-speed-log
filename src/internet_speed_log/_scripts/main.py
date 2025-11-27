@@ -4,16 +4,21 @@
 
 import sys
 
-from QuasarCode import Console
+from   QuasarCode import Console
 
+
+
+# Get commandlet functions
+from .configure import main as run_configure#TODO:
 from .log       import main as run_log
 from .plot      import main as run_plot
 
 
 
 commandlets = {
-    "log"  : run_log,
-    "plot" : run_plot,
+    "configure" : run_configure,
+    "log"       : run_log,
+    "plot"      : run_plot,
 }
 
 
@@ -34,11 +39,13 @@ usage: internet-speed-log [commandlet] [options | --help]
 
 Commandlets:
 
-    help    ->  Displays this message.
+    help      ->  Displays this message.
 
-    log     ->  Log internet speed.
+    configure -> Configure internet speed log.
 
-    plot    ->  Generate plots from logged data.
+    log       ->  Log internet speed.
+
+    plot      ->  Generate plots from logged data.
 """,
             flush = True
         )
