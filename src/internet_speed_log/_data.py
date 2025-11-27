@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: LicenseRef-Internet-Speed-Log-1.0
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from datetime import datetime
+from   abc         import ABC, abstractmethod
+from   dataclasses import dataclass
+from   datetime    import datetime
 import os
-from pathlib import Path
-from typing import Any
+from   pathlib     import Path
+from   typing      import Any
 
 import numpy as np
 
