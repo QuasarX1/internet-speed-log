@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: LicenseRef-Internet-Speed-Log-1.0
 
-from   QuasarCode import Console
+import argparse
+from   QuasarCode import Console, Settings
 from   pathlib    import Path
 import socket
 from   speedtest  import Speedtest
@@ -25,7 +26,10 @@ def test_connection(speed_tester: Speedtest, number_of_tests: int = 1) -> tuple[
     speed_tester.get_servers([])
     speed_tester.get_best_server()
 
-    for _ in range(number_of_tests):
+    for i in range(number_of_tests):
+
+        Console.print_verbose_info(f"    Running test {i+1}/{number_of_tests}...", end = "", flush = True)
+
         speed_tester.download()
         speed_tester.upload()
         results = speed_tester.results.dict()
@@ -39,11 +43,32 @@ def test_connection(speed_tester: Speedtest, number_of_tests: int = 1) -> tuple[
             server_ID      = results["server"  ]["id" ],
         ))
 
+        if Settings.verbose:
+            Console.print_raw("done.")
+
     return tuple(test_records)
 
 
 
 def main() -> None:
+
+    parser = argparse.ArgumentParser(description = "Periodically test internet connection speed.")
+
+    parser.add_argument("--verbose", "-v", action  = "store_true", help = "Display extra information."             )
+    parser.add_argument("--debug",   "-d", action  = "store_true", help = "Display extreme amounts of information.")
+
+    # This will exit the program if -h or --help are specified
+    args = parser.parse_args()
+
+    if args.verbose:
+        Settings.enable_verbose()
+    if args.debug:
+        Settings.enable_verbose()
+        Settings.enable_debug()
+
+    #Console.print_verbose_info("Arguments:")
+    #for key in args.__dict__:
+    #    Console.print_verbose_info(f"    {key}: {getattr(args, key)}")
 
     config = InternetSpeedLogConfig()
 
@@ -70,6 +95,8 @@ def main() -> None:
 
     while not kill.is_set():
 
+        Console.print_verbose_info("Checking for network...")
+
         connected: bool
         ssid:      str
         attempts:  int = 0
@@ -81,35 +108,50 @@ def main() -> None:
             except SSIDRetrievalError:
                 connected = False
                 attempts += 1
-                Console.print_error(f"Unable to find an active network connection (attempt {attempts}/{config.missing_connection_retries}).")
+                Console.print_verbose_error(f"Unable to find an active network connection (attempt {attempts}/{config.missing_connection_retries}).")
 
             if attempts <= config.missing_connection_retries:
-                Console.print_warning(f"Retrying in {config.missing_connection_retry_interval} seconds...")
+                Console.print_verbose_warning(f"Retrying in {config.missing_connection_retry_interval} seconds...")
                 time.sleep(config.missing_connection_retry_interval)
             else:
                 break
 
         if connected:
 
+            Console.print_verbose_info(f"Found network: \"{ssid}\".")
+
             log_file:      LegacyDataFile
             log_file_path: Path           = Path.cwd().joinpath(log_file_template.format(ssid))
             if not log_file_path.exists():
+                Console.print_verbose_info("Creating new log file...")
                 log_file = LegacyDataFile.new(log_file_path)
             else:
+                Console.print_verbose_info("Opening existing log file...")
                 log_file = LegacyDataFile(log_file_path)
 
+            Console.print_verbose_info("Running speed test...")
+
             test_results = test_connection(tester, config.repeats)
+
+            Console.print_verbose_info("Test complete.")
             
             log_file.insert(*test_results)
 
-            log_file.update()
+            Console.print_verbose_info("Writing results...")
+
+            if not kill.is_set(): # If the kill command has been sent, don't write out the null test(s)
+                log_file.update()
+
+            Console.print_verbose_info("Done.")
+
+            Console.print_verbose_info("Sleeping.")
 
             for _ in range(int(config.log_interval / config.kill_check_interval)):
                 if kill.is_set(): break
                 time.sleep(config.kill_check_interval)
 
         else:
-            Console.print_info(f"No active network connection available. Retrying in {config.log_interval} seconds.")
+            Console.print_verbose_info(f"No active network connection available. Retrying in {config.log_interval} seconds.")
             time.sleep(config.log_interval)
 
     killInputThread.join()
