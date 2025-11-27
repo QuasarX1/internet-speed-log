@@ -16,128 +16,100 @@ from internet_speed_log import InternetSpeedLogConfig, get_current_ssid, SSIDRet
 
 
 
-def test_connection() -> LegacyDataRecord:
-    pass#TODO:
+def test_connection(speed_tester: Speedtest, number_of_tests: int = 1) -> tuple[LegacyDataRecord, ...]:
+
+    test_records: list[LegacyDataRecord] = []
+
+    t = datetime.datetime.now()
+
+    speed_tester.get_servers([])
+    speed_tester.get_best_server()
+
+    for _ in range(number_of_tests):
+        speed_tester.download()
+        speed_tester.upload()
+        results = speed_tester.results.dict()
+
+        test_records.append(LegacyDataRecord(
+            time           = t,
+            ping           = results["ping"    ],
+            download_speed = results["download"],
+            upload_speed   = results["upload"  ],
+            server_url     = results["server"  ]["url"],
+            server_ID      = results["server"  ]["id" ],
+        ))
+
+    return tuple(test_records)
 
 
 
-def main():
+def main() -> None:
 
     config = InternetSpeedLogConfig()
 
     machine_name:      str = socket.gethostname()
     log_file_template: str = f"internet-speed-log-{machine_name}-{{}}.txt"
 
-    kill = threading.Event()
+    kill: threading.Event = threading.Event()
     def getKill(killEvent):
+        Console.print_info("Return \"x\" at any time to terminate.")
         while True:
-            value = input(killPrompt)
+            value = input()
             if value.lower() != "x":
-                print("Invalid input. Application continuing.\n" + killPrompt)
+                Console.print_error(f"Invalid input \"{value}\". Return \"x\" to exit.")
             else:
-                print("Exiting...")
+                Console.print_raw()
+                Console.print_info("Sent kill signal. Please wait for application to terminate!")
                 killEvent.set()
                 break
 
-    killInputThread = Thread(target = getKill, args = (kill, ), daemon = True)
+    killInputThread = Thread(target = getKill, args = (kill,), daemon = True)
     killInputThread.start()
 
-    tester = Speedtest()
+    tester = Speedtest(shutdown_event = kill)
+
     while not kill.is_set():
 
         connected: bool
-        try:
-            ssid = get_current_ssid()
-            connected = True
-        except SSIDRetrievalError as e:
-            connected = False
-            Console.print_error(f"Unable to find an active network connection. Retrying in {config.log_interval} seconds...")
+        ssid:      str
+        attempts:  int = 0
+        while True:
+            try:
+                ssid = get_current_ssid()
+                connected = True
+                break
+            except SSIDRetrievalError:
+                connected = False
+                attempts += 1
+                Console.print_error(f"Unable to find an active network connection (attempt {attempts}/{config.missing_connection_retries}).")
+
+            if attempts <= config.missing_connection_retries:
+                Console.print_warning(f"Retrying in {config.missing_connection_retry_interval} seconds...")
+                time.sleep(config.missing_connection_retry_interval)
+            else:
+                break
 
         if connected:
 
-            log_file_path = Path.cwd().joinpath(log_file_template.format(ssid))
-            log_file = LegacyDataFile(log_file_path)
-
-            logs = []
-            for _ in range(config.repeats):
-                logs.append(test_connection())
-            
-            log_file.insert(*logs)
-
-            tester.get_servers([])
-            tester.get_best_server()
-            tester.download()
-            tester.upload()
-            results = tester.results.dict()
-            newFile = not os.path.exists(logFile)
-            with open(logFile, "a") as file:
-                if newFile:
-                    file.write("Timestamp Ping Download Upload Server Server-ID\n")
-                file.write(datetime.datetime.now().strftime("%Y/%m/%dT%H:%M:%S") + " " + str(results["ping"]) + " " + str(results["download"]) + " " + str(results["upload"]) + " " + str(results["server"]["url"]) + " " + str(results["server"]["id"]) + "\n")
-            for _ in range(int(logInterval * 60 / exitTestDelay)):
-                if kill.is_set(): break
-                time.sleep(exitTestDelay)
-
-    killInputThread.join()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    logFile = "./log.txt"
-    logInterval: int = 10# minutes
-    exitTestDelay: int = 30# seconds
-    killPrompt = "Press X to terminate application..."
-
-    kill = threading.Event()
-    def getKill(killEvent):
-        while True:
-            value = input(killPrompt)
-            if value.lower() != "x":
-                print("Invalid input. Application continuing.\n" + killPrompt)
+            log_file:      LegacyDataFile
+            log_file_path: Path           = Path.cwd().joinpath(log_file_template.format(ssid))
+            if not log_file_path.exists():
+                log_file = LegacyDataFile.new(log_file_path)
             else:
-                print("Exiting...")
-                killEvent.set()
-                break
+                log_file = LegacyDataFile(log_file_path)
 
-    killInputThread = Thread(target = getKill, args = (kill, ), daemon = True)
-    killInputThread.start()
+            test_results = test_connection(tester, config.repeats)
+            
+            log_file.insert(*test_results)
 
-    tester = Speedtest()
-    while not kill.is_set():
-        tester.get_servers([])
-        tester.get_best_server()
-        tester.download()
-        tester.upload()
-        results = tester.results.dict()
-        newFile = not os.path.exists(logFile)
-        with open(logFile, "a") as file:
-            if newFile:
-                file.write("Timestamp Ping Download Upload Server Server-ID\n")
-            file.write(datetime.datetime.now().strftime("%Y/%m/%dT%H:%M:%S") + " " + str(results["ping"]) + " " + str(results["download"]) + " " + str(results["upload"]) + " " + str(results["server"]["url"]) + " " + str(results["server"]["id"]) + "\n")
-        for _ in range(int(logInterval * 60 / exitTestDelay)):
-            if kill.is_set(): break
-            time.sleep(exitTestDelay)
+            log_file.update()
+
+            for _ in range(int(config.log_interval * 60 / config.kill_check_interval)):
+                if kill.is_set(): break
+                time.sleep(config.kill_check_interval)
+
+        else:
+            Console.print_info(f"No active network connection available. Retrying in {config.log_interval} minutes.")
+            time.sleep(config.log_interval * 60)
 
     killInputThread.join()
