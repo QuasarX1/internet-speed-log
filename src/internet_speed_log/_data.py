@@ -85,10 +85,10 @@ class LegacyDataFile(IDataFile):
     def __init__(self, filepath: Path) -> None:
 
         # Check the path is valid
-        if not filepath.is_file():
-            raise ValueError(f"Provided path \"{filepath}\" is not a file.")
         if not filepath.exists():
             raise FileNotFoundError(f"Unable to locate data file at \"{filepath}\".")
+        if not filepath.is_file():
+            raise ValueError(f"Provided path \"{filepath}\" is not a file.")
 
         self.__path:         Path                   = filepath
         self.__loaded:       bool                   = False
@@ -99,8 +99,6 @@ class LegacyDataFile(IDataFile):
     def new(filepath: Path) -> "LegacyDataFile":
 
         # Check the path is valid
-        if not filepath.is_file():
-            raise ValueError(f"Provided path \"{filepath}\" is not a file.")
         if filepath.exists():
             raise FileExistsError(f"File already exists at \"{filepath}\".")
 
