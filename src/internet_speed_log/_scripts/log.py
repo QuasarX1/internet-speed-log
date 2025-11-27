@@ -104,12 +104,12 @@ def main() -> None:
 
             log_file.update()
 
-            for _ in range(int(config.log_interval * 60 / config.kill_check_interval)):
+            for _ in range(int(config.log_interval / config.kill_check_interval)):
                 if kill.is_set(): break
                 time.sleep(config.kill_check_interval)
 
         else:
-            Console.print_info(f"No active network connection available. Retrying in {config.log_interval} minutes.")
-            time.sleep(config.log_interval * 60)
+            Console.print_info(f"No active network connection available. Retrying in {config.log_interval} seconds.")
+            time.sleep(config.log_interval)
 
     killInputThread.join()

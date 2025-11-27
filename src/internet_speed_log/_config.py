@@ -14,7 +14,7 @@ default_config_text = """\
 
 # Logging Options
 
-log_interval:        10 # minutes (must be a multiple of `kill_check_interval`)
+log_interval:        10 # seconds
 repeats:             1
 
 # Application Options
